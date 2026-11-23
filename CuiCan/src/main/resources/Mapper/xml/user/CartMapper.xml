@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.cuican.Mapper.user.CartMapper">
+
+    <select id="selectCartByUserId" resultType="org.example.cuican.Bean.user.CartVO">
+        SELECT c.id, c.product_id AS productId, p.name AS productName,
+               p.cover_image AS productImage, p.price, c.quantity, c.checked, p.stock
+        FROM cart c JOIN product p ON c.product_id = p.id
+        WHERE c.user_id = #{userId}
+        ORDER BY c.create_time DESC
+    </select>
+
+    <select id="selectByUserIdAndProductId" resultType="org.example.cuican.Bean.user.Cart">
+        SELECT * FROM cart WHERE user_id = #{userId} AND product_id = #{productId} LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cart(id, user_id, product_id, quantity, checked, create_time)
+        VALUES(#{id}, #{userId}, #{productId}, #{quantity}, #{checked}, NOW())
+    </insert>
+
+    <update id="updateQuantity">
+        UPDATE cart SET quantity = #{quantity} WHERE id = #{id}
+    </update>
+
+    <update id="toggleCheck">
+        UPDATE cart SET checked = CASE WHEN checked = 1 THEN 0 ELSE 1 END WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM cart WHERE id = #{id}
+    </delete>
+
+    <select id="selectMaxId" resultType="java.lang.Long">
+        SELECT MAX(id) FROM cart
+    </select>
+
+    <select id="selectCheckedByUserId" resultType="org.example.cuican.Bean.user.CartVO">
+        SELECT c.id, c.product_id AS productId, p.name AS productName,
+               p.cover_image AS productImage, p.price, c.quantity, c.checked, p.stock
+        FROM cart c JOIN product p ON c.product_id = p.id
+        WHERE c.user_id = #{userId} AND c.checked = 1
+        ORDER BY c.create_time DESC
+    </select>
+
+    <select id="selectByIds" resultType="org.example.cuican.Bean.user.CartVO">
+        SELECT c.id, c.product_id AS productId, p.name AS productName,
+               p.cover_image AS productImage, p.price, c.quantity, c.checked, p.stock
+        FROM cart c JOIN product p ON c.product_id = p.id
+        WHERE c.id IN <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM cart WHERE id IN <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </delete>
+
+</mapper>

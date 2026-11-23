@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.cuican.Mapper.auth.UserTokenMapper">
+
+    <insert id="insert">
+        INSERT INTO user_token
+            (user_id, token, token_type, expire_time, created_time, is_valid)
+        VALUES
+            (#{userId}, #{token}, #{tokenType}, #{expireTime}, #{createdTime}, #{isValid})
+    </insert>
+    <select id="selectByToken" resultType="org.example.cuican.Bean.auth.UserToken">
+        SELECT * FROM user_token WHERE token = #{token} LIMIT 1
+    </select>
+
+    <update id="invalidateByUserId">
+        UPDATE user_token SET is_valid = 0 WHERE user_id = #{userId}
+    </update>
+
+    <update id="invalidateByToken">
+        UPDATE user_token SET is_valid = 0 WHERE token = #{token}
+    </update>
+
+</mapper>

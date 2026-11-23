@@ -1,0 +1,151 @@
+/* ============================ */
+/* 全局样式 - 璀璨数据可视化大屏 */
+/* ============================ */
+
+:root {
+  --bg-deep: #050b1a;
+  --bg-dark: #0a1428;
+  --bg-card: rgba(10, 25, 60, 0.55);
+  --bg-card-strong: rgba(8, 22, 54, 0.85);
+  --line: rgba(0, 217, 255, 0.18);
+  --line-strong: rgba(0, 217, 255, 0.45);
+  --text: #d7e1f3;
+  --text-mute: #8aa0c4;
+  --text-strong: #ffffff;
+  --accent: #00d9ff;
+  --accent-2: #5b8dff;
+  --accent-3: #b153ff;
+  --gold: #ffce6e;
+  --green: #6dffb6;
+  --red: #ff5577;
+  --orange: #ffa14d;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --glow: 0 0 14px rgba(0, 217, 255, 0.45);
+
+  --sans:  PingFang SC, Microsoft YaHei, Segoe UI, Roboto, Arial, sans-serif;
+  --mono: ui-monospace, Cascadia Mono, JetBrains Mono, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-deep);
+  font-family: var(--sans);
+  color: var(--text);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: radial-gradient(ellipse at top, #0b1f4f 0%, #050b1a 60%, #02060f 100%);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 217, 255, 0.18); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 217, 255, 0.36); }
+
+/* 文字通用 */
+.dv-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-strong);
+  letter-spacing: 1px;
+}
+.dv-sub {
+  font-size: 12px;
+  color: var(--text-mute);
+}
+.dv-num {
+  font-family: var(--mono);
+  font-feature-settings: tnum;
+}
+
+/* 面板 */
+.panel {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  height: 38px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, rgba(0, 217, 255, 0.18), rgba(0, 217, 255, 0));
+  border-bottom: 1px solid var(--line);
+}
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-strong);
+  letter-spacing: 1px;
+}
+.panel-title::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  margin-right: 8px;
+  box-shadow: 0 0 8px var(--accent);
+  vertical-align: middle;
+}
+.panel-body {
+  flex: 1;
+  position: relative;
+  padding: 10px;
+  overflow: hidden;
+}
+
+/* ECharts 主题色继承 */
+canvas { outline: none; }
+
+/* 标签通用 */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 10px;
+  background: rgba(0, 217, 255, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+}
+.badge.green { background: rgba(109, 255, 182, 0.12); color: var(--green); border-color: rgba(109, 255, 182, 0.3); }
+.badge.gold { background: rgba(255, 206, 110, 0.12); color: var(--gold); border-color: rgba(255, 206, 110, 0.3); }
+.badge.red { background: rgba(255, 85, 119, 0.12); color: var(--red); border-color: rgba(255, 85, 119, 0.3); }
+.badge.orange { background: rgba(255, 161, 77, 0.12); color: var(--orange); border-color: rgba(255, 161, 77, 0.3); }
+
+/* 通用文字渐变 */
+.text-grad {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 简单的加载中/空状态 */
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-mute);
+  font-size: 13px;
+}
+

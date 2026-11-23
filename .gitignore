@@ -1,0 +1,36 @@
+# 依赖
+node_modules/
+
+# 构建产物
+target/
+dist/
+build/
+
+# 日志
+logs/
+*.log
+vite-dev.log
+vite-dev.err.log
+build_log.txt
+
+# 运行时数据
+upload/
+data/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# Maven
+mvnw
+mvnw.cmd
+.mvn/
+
+# 临时
+*.tmp
+*.bak

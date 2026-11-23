@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.cuican.Mapper.user.TagMapper">
+
+    <select id="selectTagNamesByUserId" resultType="java.lang.String">
+        SELECT t.name
+        FROM tag t
+                 JOIN user_tag ut ON t.id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+    </select>
+
+    <select id="selectAll" resultType="org.example.cuican.Bean.user.Tag">
+        SELECT id, name FROM tag ORDER BY id ASC
+    </select>
+
+    <select id="selectTagIdsByUserId" resultType="java.lang.Long">
+        SELECT tag_id FROM user_tag WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUserTag">
+        INSERT INTO user_tag(user_id, tag_id) VALUES(#{userId}, #{tagId})
+    </insert>
+
+    <delete id="deleteUserTag">
+        DELETE FROM user_tag WHERE user_id = #{userId} AND tag_id = #{tagId}
+    </delete>
+
+</mapper>

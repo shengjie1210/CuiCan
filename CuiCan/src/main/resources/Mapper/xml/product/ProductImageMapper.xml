@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.cuican.Mapper.product.ProductImageMapper">
+
+    <!-- ⭐ 映射关系（必须和数据库字段完全一致） -->
+    <resultMap id="ImageMap" type="org.example.cuican.Bean.product.ProductImage">
+        <id column="id" property="id"/>
+        <result column="product_id" property="productId"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="sort_order" property="sortOrder"/>
+    </resultMap>
+
+    <!-- ⭐ 查询商品图片 -->
+    <select id="selectByProductId" resultMap="ImageMap">
+        select id, product_id, image_url, sort_order
+        from product_image
+        where product_id = #{productId}
+        order by sort_order asc
+    </select>
+
+</mapper>

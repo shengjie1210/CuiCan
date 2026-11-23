@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.cuican.Mapper.product.ProductMapper">
+
+    <!-- 分类过滤：匹配商品主分类 或 关联表(product_category)里的分类 -->
+    <sql id="catFilter">
+        <if test="ids != null and ids.size() > 0">
+            AND (
+                category_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                OR EXISTS (
+                    SELECT 1 FROM product_category pc
+                    WHERE pc.product_id = product.id
+                      AND pc.category_id IN
+                      <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+                )
+            )
+        </if>
+    </sql>
+
+    <!-- 类型关键词过滤：商品名称包含任意一个关键词 -->
+    <sql id="typeWordFilter">
+        <if test="typeWords != null and typeWords.size() > 0">
+            AND (
+                <foreach collection="typeWords" item="word" open="(" separator=" OR " close=")">
+                    name LIKE CONCAT('%', #{word}, '%')
+                </foreach>
+            )
+        </if>
+    </sql>
+
+    <!-- 价格上限过滤 -->
+    <sql id="priceFilter">
+        <if test="maxPrice != null">
+            AND price &lt;= #{maxPrice}
+        </if>
+    </sql>
+
+    <resultMap id="ProductMap" type="org.example.cuican.Bean.product.Product">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="price" property="price"/>
+        <result column="original_price" property="originalPrice"/>
+        <result column="stock" property="stock"/>
+        <result column="sales" property="sales"/>
+        <result column="description" property="description"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 查询全部商品 -->
+    <select id="selectAll" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE status = 1
+        ORDER BY sales DESC, create_time DESC
+    </select>
+
+    <!-- 查询所有上架商品 -->
+    <select id="selectAllOnShelf" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE status = 1
+        ORDER BY sales DESC, create_time DESC
+    </select>
+
+    <!-- 根据多条件搜索商品 -->
+    <select id="selectByConditions" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE status = 1
+
+        <include refid="catFilter" />
+        <include refid="priceFilter" />
+        <include refid="typeWordFilter" />
+
+        ORDER BY sales DESC, create_time DESC
+    </select>
+
+    <!-- 正确：通过中间表查 -->
+    <select id="selectByCategoryIds" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE status = 1
+
+        <include refid="catFilter" />
+
+        ORDER BY sales DESC, create_time DESC
+    </select>
+
+    <select id="selectById" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE id = #{id}
+    </select>
+
+    <!--  带排序 + 分类 -->
+    <select id="selectByCategoryIdsSort" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE status = 1
+
+        <include refid="catFilter" />
+
+        ORDER BY
+        <choose>
+            <when test="sortField == 'name'">
+                name
+            </when>
+            <when test="sortField == 'sales'">
+                sales
+            </when>
+            <when test="sortField == 'stock'">
+                stock
+            </when>
+            <when test="sortField == 'price'">
+                price
+            </when>
+            <otherwise>
+                sales
+            </otherwise>
+        </choose>
+
+        <choose>
+            <when test="order == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+
+        create_time DESC
+    </select>
+
+    <select id="selectPage" resultMap="ProductMap">
+        SELECT *
+        FROM product
+        WHERE status = 1
+
+        <include refid="catFilter" />
+
+        <if test="keyword != null and keyword != ''">
+            AND name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+
+        ORDER BY
+        <choose>
+            <when test="sortField == 'name'">
+                name
+            </when>
+            <when test="sortField == 'sales'">
+                sales
+            </when>
+            <when test="sortField == 'stock'">
+                stock
+            </when>
+            <when test="sortField == 'price'">
+                price
+            </when>
+            <otherwise>
+                sales
+            </otherwise>
+        </choose>
+
+        <choose>
+            <when test="order == 'asc'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+
+        create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countPage" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM product
+        WHERE status = 1
+
+        <include refid="catFilter" />
+
+        <if test="keyword != null and keyword != ''">
+            AND name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+    </select>
+
+    <update id="decrementStock">
+        UPDATE product SET stock = stock - #{quantity}
+        WHERE id = #{productId} AND stock >= #{quantity}
+    </update>
+    <update id="incrementStock">
+        UPDATE product SET stock = stock + #{quantity}
+        WHERE id = #{productId}
+    </update>
+</mapper>

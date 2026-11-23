@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.cuican.Mapper.ai.AiKnowledgeMapper">
+
+    <resultMap id="AiKnowledgeMap" type="org.example.cuican.Bean.ai.AiKnowledge">
+        <id column="id" property="id"/>
+        <result column="category" property="category"/>
+        <result column="question" property="question"/>
+        <result column="answer" property="answer"/>
+        <result column="keywords" property="keywords"/>
+        <result column="product_id" property="productId"/>
+        <result column="enabled" property="enabled"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="AiKnowledgeMap">
+        SELECT * FROM ai_knowledge ORDER BY id DESC
+    </select>
+
+    <select id="search" resultMap="AiKnowledgeMap">
+        SELECT * FROM ai_knowledge
+        WHERE enabled = 1
+          AND (
+            question LIKE CONCAT('%', #{keyword}, '%')
+            OR answer LIKE CONCAT('%', #{keyword}, '%')
+            OR keywords LIKE CONCAT('%', #{keyword}, '%')
+            OR category LIKE CONCAT('%', #{keyword}, '%')
+          )
+        ORDER BY id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectById" resultMap="AiKnowledgeMap">
+        SELECT * FROM ai_knowledge WHERE id = #{id}
+    </select>
+
+    <select id="selectByQuestion" resultMap="AiKnowledgeMap">
+        SELECT * FROM ai_knowledge WHERE question = #{question} ORDER BY id DESC LIMIT 1
+    </select>
+
+    <select id="selectByProductId" resultMap="AiKnowledgeMap">
+        SELECT * FROM ai_knowledge WHERE product_id = #{productId} ORDER BY id DESC
+    </select>
+
+    <select id="selectByKeyword" resultMap="AiKnowledgeMap">
+        SELECT * FROM ai_knowledge
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (question LIKE CONCAT('%', #{keyword}, '%')
+                 OR answer LIKE CONCAT('%', #{keyword}, '%')
+                 OR keywords LIKE CONCAT('%', #{keyword}, '%')
+                 OR category LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByKeyword" resultType="int">
+        SELECT COUNT(*) FROM ai_knowledge
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (question LIKE CONCAT('%', #{keyword}, '%')
+                 OR answer LIKE CONCAT('%', #{keyword}, '%')
+                 OR keywords LIKE CONCAT('%', #{keyword}, '%')
+                 OR category LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="org.example.cuican.Bean.ai.AiKnowledge" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_knowledge(category, question, answer, keywords, product_id, enabled, create_time, update_time)
+        VALUES (#{category}, #{question}, #{answer}, #{keywords}, #{productId}, #{enabled}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="org.example.cuican.Bean.ai.AiKnowledge">
+        UPDATE ai_knowledge
+        SET category = #{category},
+            question = #{question},
+            answer = #{answer},
+            keywords = #{keywords},
+            product_id = #{productId},
+            enabled = #{enabled},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM ai_knowledge WHERE id = #{id}
+    </delete>
+</mapper>
+

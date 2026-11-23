@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.cuican.Mapper.user.UserProfileMapper">
+
+    <!-- 查询用户详情 -->
+    <select id="selectById" resultType="org.example.cuican.Bean.user.UserProfile">
+        SELECT
+            id,
+            username,
+            phone,
+            gender,
+            member_level AS memberLevel,
+            total_spent AS totalSpent,
+            balance,
+            member_card_no AS memberCardNo,
+            status,
+            create_time AS createTime,
+            update_time AS updateTime,
+            role_id AS roleId,
+            avatar
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 更新用户信息 -->
+    <update id="update">
+        UPDATE user
+        SET
+            username = #{username},
+            phone = #{phone},
+            gender = #{gender},
+            avatar = #{avatar},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新头像 -->
+    <update id="updateAvatar">
+        UPDATE user SET avatar = #{avatar}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <!-- 修改密码 -->
+    <update id="updatePassword">
+        update user
+        set password = #{password}
+        where id = #{userId}
+    </update>
+
+</mapper>

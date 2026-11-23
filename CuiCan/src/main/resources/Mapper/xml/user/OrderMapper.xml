@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.cuican.Mapper.user.OrderMapper">
+
+    <!-- 用户自己的订单列表 -->
+    <select id="selectByUserId" resultType="org.example.cuican.Bean.user.Order">
+        SELECT id, order_no AS orderNo, user_id AS userId, total_amount AS totalAmount,
+               original_amount AS originalAmount, status, address_id AS addressId,
+               receiver_name AS receiverName, receiver_phone AS receiverPhone,
+               province, city, detail_address AS detailAddress, note,
+               pay_method AS payMethod, pay_time AS payTime, ship_time AS shipTime,
+               confirm_time AS confirmTime, ship_method AS shipMethod,
+               tracking_no AS trackingNo, create_time AS createTime
+        FROM orders
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 任意订单（按 ID） -->
+    <select id="selectById" resultType="org.example.cuican.Bean.user.Order">
+        SELECT id, order_no AS orderNo, user_id AS userId, total_amount AS totalAmount,
+               original_amount AS originalAmount, status, address_id AS addressId,
+               receiver_name AS receiverName, receiver_phone AS receiverPhone,
+               province, city, detail_address AS detailAddress, note,
+               pay_method AS payMethod, pay_time AS payTime, ship_time AS shipTime,
+               confirm_time AS confirmTime, ship_method AS shipMethod,
+               tracking_no AS trackingNo, create_time AS createTime
+        FROM orders WHERE id = #{id}
+    </select>
+
+    <!-- 新增订单 -->
+    <insert id="insert" parameterType="org.example.cuican.Bean.user.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders(
+            id, order_no, user_id, total_amount, original_amount, status,
+            receiver_name, receiver_phone, province, city, detail_address, note,
+            pay_method, create_time
+        ) VALUES (
+            #{id}, #{orderNo}, #{userId}, #{totalAmount}, #{originalAmount}, #{status},
+            #{receiverName}, #{receiverPhone}, #{province}, #{city}, #{detailAddress}, #{note},
+            #{payMethod}, NOW()
+        )
+    </insert>
+
+    <!-- 取最大 id（orders 表非自增） -->
+    <select id="selectMaxId" resultType="java.lang.Long">
+        SELECT MAX(id) FROM orders
+    </select>
+
+    <!-- 仅改 status -->
+    <update id="updateStatus">
+        UPDATE orders SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <!-- 标记已支付（status=1 + pay_time + pay_method） -->
+    <update id="updatePaidInfo">
+        UPDATE orders
+        SET status = #{status}, pay_time = #{payTime}, pay_method = #{payMethod}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 标记已发货（status=2 + ship_time + ship_method + tracking_no） -->
+    <update id="updateShipInfo">
+        UPDATE orders
+        SET status = #{status}, ship_time = #{shipTime},
+            ship_method = #{shipMethod}, tracking_no = #{trackingNo}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 标记已确认收货（status=3 + confirm_time） -->
+    <update id="updateConfirmInfo">
+        UPDATE orders
+        SET status = #{status}, confirm_time = #{confirmTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 物理删除（取消订单 = 真删） -->
+    <delete id="deleteById">
+        DELETE FROM orders WHERE id = #{id}
+    </delete>
+
+    <!-- ========== Admin ========== -->
+    <!-- 查所有订单（status / keyword 可空，按时间倒序，分页） -->
+    <select id="selectAll" resultType="org.example.cuican.Bean.user.Order">
+        SELECT id, order_no AS orderNo, user_id AS userId, total_amount AS totalAmount,
+               original_amount AS originalAmount, status, address_id AS addressId,
+               receiver_name AS receiverName, receiver_phone AS receiverPhone,
+               province, city, detail_address AS detailAddress, note,
+               pay_method AS payMethod, pay_time AS payTime, ship_time AS shipTime,
+               confirm_time AS confirmTime, ship_method AS shipMethod,
+               tracking_no AS trackingNo, create_time AS createTime
+        FROM orders
+        WHERE 1 = 1
+        <if test="status != null"> AND status = #{status} </if>
+        <if test="keyword != null and keyword != ''">
+            AND (order_no LIKE CONCAT("%", #{keyword}, "%")
+             OR receiver_phone LIKE CONCAT("%", #{keyword}, "%")
+             OR receiver_name LIKE CONCAT("%", #{keyword}, "%"))
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM orders
+        WHERE 1 = 1
+        <if test="status != null"> AND status = #{status} </if>
+        <if test="keyword != null and keyword != ''">
+            AND (order_no LIKE CONCAT("%", #{keyword}, "%")
+             OR receiver_phone LIKE CONCAT("%", #{keyword}, "%")
+             OR receiver_name LIKE CONCAT("%", #{keyword}, "%"))
+        </if>
+    </select>
+
+</mapper>

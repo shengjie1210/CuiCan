@@ -1,0 +1,2 @@
+-- 购物车表自增主键
+ALTER TABLE cart MODIFY COLUMN id bigint NOT NULL AUTO_INCREMENT;

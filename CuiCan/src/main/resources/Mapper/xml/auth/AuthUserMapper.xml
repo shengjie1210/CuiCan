@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.cuican.Mapper.auth.AuthUserMapper">
+    <select id="selectByUsername" resultType="org.example.cuican.Bean.auth.AuthUser">
+        SELECT id, username, password, role_id AS roleId, avatar, status FROM user
+        WHERE username = #{username}
+            LIMIT 1
+    </select>
+
+    <select id="selectById" resultType="org.example.cuican.Bean.auth.AuthUser">
+        SELECT id, username, password, role_id AS roleId, avatar, status FROM user
+        WHERE id = #{id}
+    </select>
+
+    <update id="updatePassword">
+        update user
+        set password = #{password}
+        where id = #{userId}
+    </update>
+    <select id="selectMaxId" resultType="java.lang.Long">
+        SELECT MAX(id) FROM user
+    </select>
+
+    <update id="addBalance">
+        UPDATE user
+        SET balance = COALESCE(balance, 0) + #{amount},
+            update_time = NOW()
+        WHERE id = #{userId}
+    </update>
+
+    <select id="selectBalance" resultType="java.math.BigDecimal">
+        SELECT COALESCE(balance, 0) FROM user WHERE id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user(id, username, password, phone, gender, member_level,
+                        total_spent, balance, member_card_no, status,
+                        role_id, avatar, create_time, update_time)
+        VALUES(#{id}, #{username}, #{password}, #{phone}, #{gender}, #{memberLevel},
+               #{totalSpent}, #{balance}, #{memberCardNo}, #{status},
+               #{roleId}, #{avatar}, #{createTime}, #{updateTime})
+    </insert>
+
+</mapper>
